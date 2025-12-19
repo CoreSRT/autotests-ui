@@ -5,7 +5,8 @@ with sync_playwright() as playwright:
         headless=False,
         slow_mo=500
     )
-    page = browser.new_page()
+    context = browser.new_context()
+    page = context.new_page()
     page.goto("https://nikita-filonov.github.io/qa-automation-engineer-ui-course/#/auth/registration")
 
     email_input = page.get_by_test_id('registration-form-email-input').locator('input')
@@ -20,6 +21,15 @@ with sync_playwright() as playwright:
     registration_button = page.get_by_test_id('registration-page-registration-button')
     registration_button.click()
 
-    dashboard_label = page.get_by_test_id('dashboard-toolbar-title-text')
-    expect(dashboard_label).to_be_visible()
-    expect(dashboard_label).to_have_text('Dashboard')
+    context.storage_state(path='browser-state.json')
+
+with sync_playwright() as playwright:
+    browser = playwright.chromium.launch(
+        headless=False,
+        slow_mo=500
+    )
+    context = browser.new_context(storage_state='browser-state.json')
+    page = context.new_page()
+
+    page.goto("https://nikita-filonov.github.io/qa-automation-engineer-ui-course/#/dashboard")
+    page.wait_for_timeout(5000)
